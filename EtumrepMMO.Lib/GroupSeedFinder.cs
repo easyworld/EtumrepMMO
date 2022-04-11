@@ -39,7 +39,7 @@ public static class GroupSeedFinder
                 {
                     // Get the group seed - O(1) calc
                     var groupSeed = GroupSeedReversal.GetGroupSeed(genSeed);
-                    if (!IsValidGroupSeed(groupSeed, ecs))
+                    if (!IsValidStaticGroupSeed(groupSeed, ecs) && !IsValidGroupSeed(groupSeed, ecs))
                         continue;
 
                     Console.WriteLine($"Found a group seed with PID roll count = {rolls}");
@@ -77,6 +77,35 @@ public static class GroupSeedFinder
             var index = ecs.IndexOf(ec);
             if (index != -1)
                 matched++;
+        }
+
+        return matched == ecs.Length;
+    }
+
+    // copied from https://github.com/capitalism-sudo/EtumrepSeed
+    private static bool IsValidStaticGroupSeed(ulong seed, ReadOnlySpan<uint> ecs)
+    {
+        int matched = 0;
+
+        var rng = new Xoroshiro128Plus(seed);
+        for (int count = 0; count < 4; count++)
+        {
+            var genseed = rng.Next();
+            _ = rng.Next(); // unknown
+
+            var slotrng = new Xoroshiro128Plus(genseed);
+            _ = slotrng.Next(); // slot
+            var mon_seed = slotrng.Next();
+            // _ = slotrng.Next(); // level
+
+            var monrng = new Xoroshiro128Plus(mon_seed);
+            var ec = (uint)monrng.NextInt();
+
+            var index = ecs.IndexOf(ec);
+            if (index != -1)
+                matched++;
+            var reseed = new Xoroshiro128Plus(rng.Next());
+            rng = reseed;
         }
 
         return matched == ecs.Length;
