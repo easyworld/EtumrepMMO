@@ -39,6 +39,9 @@ try
 catch (Exception)
 {
     Console.WriteLine("Invalid data in mons.txt");
+    Console.WriteLine();
+    Console.WriteLine("Press [ENTER] to exit.");
+    Console.ReadLine();
     return;
 }
 
