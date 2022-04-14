@@ -131,7 +131,7 @@ namespace EtumrepMMO.DodoApp
                         SendChannelAtMessage(eventBody.DodoId, $"处理{inputs.Count}个宝可梦数据中……，大约需要{5*inputs.Count}秒", _channelId);
                         var result = GroupSeedFinder.FindSeed(inputs);
                         SendChannelAtMessage(eventBody.DodoId,
-                            result is default(ulong) ? "没找到seed，请重新抓" : $"seed:{result}",
+                            result.FirstIndex == -1 ? "没找到seed，请重新抓" : $"seed:{result}",
                             _channelId);
                     }
                     finally
