@@ -102,6 +102,24 @@ namespace EtumrepMMO.DodoApp
                             case "SID":
                                 pa8.SID = int.Parse(splitArray[1]);
                                 break;
+                            case "AbilityNumber":
+                                pa8.AbilityNumber = int.Parse(splitArray[1]);
+                                break;
+                            case "Gender":
+                                pa8.Gender = int.Parse(splitArray[1]);
+                                break;
+                            case "Nature":
+                                pa8.Nature = int.Parse(splitArray[1]);
+                                break;
+                            case "IsAlpha":
+                                pa8.IsAlpha = bool.Parse(splitArray[1]);
+                                break;
+                            case "HeightScalar":
+                                pa8.HeightScalar = int.Parse(splitArray[1]);
+                                break;
+                            case "WeightScalar":
+                                pa8.WeightScalar = int.Parse(splitArray[1]);
+                                break;
                         }
                     }
 
@@ -131,7 +149,7 @@ namespace EtumrepMMO.DodoApp
                         SendChannelAtMessage(eventBody.DodoId, $"处理{inputs.Count}个宝可梦数据中……，大约需要{5*inputs.Count}秒", _channelId);
                         var result = GroupSeedFinder.FindSeed(inputs);
                         SendChannelAtMessage(eventBody.DodoId,
-                            result.FirstIndex == -1 ? "没找到seed，请重新抓" : $"seed:{result}",
+                            result.FirstIndex == -1 ? "没找到seed，请重新抓" : $"从第{result.FirstIndex + 1}只宝可梦算出了seed:{result.Seed}",
                             _channelId);
                     }
                     finally
@@ -158,5 +176,6 @@ namespace EtumrepMMO.DodoApp
                 }
             });
         }
+
     }
 }
