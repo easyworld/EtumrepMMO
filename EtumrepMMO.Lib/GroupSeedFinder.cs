@@ -1,4 +1,5 @@
-﻿using PKHeX.Core;
+﻿using System.Text.RegularExpressions;
+using PKHeX.Core;
 using static EtumrepMMO.Lib.SpawnerType;
 
 namespace EtumrepMMO.Lib;
@@ -76,6 +77,67 @@ public static class GroupSeedFinder
                 }
             }
         }
+
         return (default, -1);
+    }
+
+    public static IReadOnlyList<PKM> GetInputsFromText(string text)
+    {
+        var inputs = new List<PKM>();
+        try
+        {
+            var lines = Regex.Split(text.Trim(), "\\s").Where(str => !string.IsNullOrWhiteSpace(str))
+                .ToList();
+            PA8 pa8 = new PA8();
+            foreach (var line in lines)
+            {
+                var splitArray = line.Trim().Split(":");
+                if (splitArray[0] == "species" && pa8.Species != 0)
+                {
+                    inputs.Add(pa8);
+                    pa8 = new PA8();
+                }
+
+                switch (splitArray[0])
+                {
+                    case "species":
+                        pa8.Species = int.Parse(splitArray[1]);
+                        break;
+                    case "pid":
+                        pa8.PID = uint.Parse(splitArray[1]);
+                        break;
+                    case "ec":
+                        pa8.EncryptionConstant = uint.Parse(splitArray[1]);
+                        break;
+                    case "IVs":
+                        pa8.IVs = splitArray[1].Split(",").Select(int.Parse).ToArray();
+                        break;
+                    case "TID":
+                        pa8.TID = int.Parse(splitArray[1]);
+                        break;
+                    case "SID":
+                        pa8.SID = int.Parse(splitArray[1]);
+                        break;
+                    case "extra":
+                        // abilityNumber gender nature isAlpha HeightScalar WeightScalar
+                        //          3bit   2bit   8bit    1bit         8bit         8bit
+                        var extra = uint.Parse(splitArray[1]);
+                        pa8.WeightScalar = (int) (extra & 0xFF);
+                        pa8.HeightScalar = (int) ((extra >> 8) & 0xFF);
+                        pa8.IsAlpha = ((extra >> 16) & 1) == 1;
+                        pa8.Nature = (int) ((extra >> 17) & 0xFF);
+                        pa8.Gender = (int) ((extra >> 25) & 0x3);
+                        pa8.AbilityNumber = (int) ((extra >> 27) & 0x7);
+                        break;
+                }
+            }
+
+            if (pa8.Species != 0) inputs.Add(pa8);
+        }
+        catch (Exception)
+        {
+        }
+
+        return inputs;
     }
 }

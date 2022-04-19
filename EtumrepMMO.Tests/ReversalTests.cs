@@ -99,4 +99,29 @@ public class ReversalTests
         var result = RuntimeReversal.IsPotentialAntiShiny(tid, sid, pid);
         result.Should().BeTrue();
     }
+
+    [Fact]
+    public void TestExtra()
+    {
+        var result = new PA8(Properties.Resources.Snorlax2);
+
+
+        var extra = ((uint)result.AbilityNumber << 27) + ((uint)result.Gender << 25) + ((uint)result.Nature << 17)
+                    + (result is IAlpha { IsAlpha: true } ? (uint)1 << 16 : 0);
+        if (result is IScaledSize s)
+        {
+            extra += ((uint)s.HeightScalar << 8) + (uint)s.WeightScalar;
+        }
+        PA8 pa8 = new PA8();
+        pa8.WeightScalar = (int)(extra & 0xFF);
+        pa8.HeightScalar = (int)((extra >> 8) & 0xFF);
+        pa8.IsAlpha = ((extra >> 16) & 1) == 1;
+        pa8.Nature = (int)((extra >> 17) & 0xFF);
+        pa8.Gender = (int)((extra >> 25) & 0x3);
+        pa8.AbilityNumber = (int)((extra >> 27) & 0x7);
+
+        var equals = result.AbilityNumber == pa8.AbilityNumber && result.Gender == pa8.Gender && result.Nature == pa8.Nature 
+                     && result.IsAlpha == pa8.IsAlpha && result.HeightScalar == pa8.HeightScalar && result.WeightScalar == pa8.WeightScalar;
+        equals.Should().BeTrue();
+    }
 }

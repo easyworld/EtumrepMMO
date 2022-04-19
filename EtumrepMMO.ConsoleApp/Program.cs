@@ -5,45 +5,21 @@ using PKHeX.Core;
 //const string entityFolderName = "mons";
 //var inputs = GroupSeedFinder.GetInputs(entityFolderName);
 const string fileName = "mons.txt";
-var inputs = new List<PKM>();
+var text = "";
 try
 {
-    var lines = Regex.Split(File.ReadAllText(fileName), "\\s").Where(str => !string.IsNullOrWhiteSpace(str)).ToList();
-    PA8 pa8 = new PA8();
-    foreach (var line in lines)
-    {
-        var splitArray = line.Trim().Split(":");
-        if (splitArray[0] == "species" && pa8.Species != 0)
-        {
-            inputs.Add(pa8);
-            pa8 = new PA8();
-        }
-        switch (splitArray[0])
-        {
-            case "species":
-                pa8.Species = int.Parse(splitArray[1]); break;
-            case "pid":
-                pa8.PID = uint.Parse(splitArray[1]); break;
-            case "ec":
-                pa8.EncryptionConstant = uint.Parse(splitArray[1]); break;
-            case "IVs":
-                pa8.IVs = splitArray[1].Split(",").Select(int.Parse).ToArray(); break;
-            case "TID":
-                pa8.TID = int.Parse(splitArray[1]); break;
-            case "SID":
-                pa8.SID = int.Parse(splitArray[1]); break;
-        }
-    }
-    if (pa8.Species != 0) inputs.Add(pa8);
+    text = File.ReadAllText(fileName);
 }
 catch (Exception)
 {
-    Console.WriteLine("Invalid data in mons.txt");
+    Console.WriteLine("Fail to read mons.txt");
     Console.WriteLine();
     Console.WriteLine("Press [ENTER] to exit.");
     Console.ReadLine();
     return;
 }
+
+var inputs = GroupSeedFinder.GetInputsFromText(text);
 
 if (inputs.Count < 2)
 {
