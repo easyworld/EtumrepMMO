@@ -32,8 +32,8 @@ public static class GroupSeedValidator
         var rand = new Xoroshiro128Plus(seed);
         for (int i = 0; i < count; i++)
         {
-            var genseed = rand.Next();
-            _ = rand.Next(); // unknown
+            var genseed = rand.Next(); // generate/slot seed
+            _ = rand.Next(); // alpha move, don't care
 
             var ec = GetEncryptionConstant(genseed);
             var index = ecs.IndexOf(ec);
@@ -61,14 +61,14 @@ public static class GroupSeedValidator
         if (ecs.Length == 1)
             return false;
 
-        var list = ecs.ToArray().ToList();
+        var list = new List<uint>(ecs.ToArray());
 
         while (list.Count != 0)
         {
             var rand = new Xoroshiro128Plus(seed);
 
-            var genseed = rand.Next();
-            _ = rand.Next(); // unknown
+            var genseed = rand.Next(); // generate/slot seed
+            _ = rand.Next(); // alpha move, don't care
 
             var ec = GetEncryptionConstant(genseed);
             var index = list.IndexOf(ec);
@@ -101,13 +101,13 @@ public static class GroupSeedValidator
         if (ecs.Length == 1)
             return false;
 
-        var list = ecs.ToArray().ToList();
+        var list = new List<uint>(ecs.ToArray());
 
         // Check first
         var rand = new Xoroshiro128Plus(seed);
         {
-            var genseed = rand.Next();
-            _ = rand.Next(); // unknown
+            var genseed = rand.Next(); // generate/slot seed
+            _ = rand.Next(); // alpha move, don't care
             var ec = GetEncryptionConstant(genseed);
             if (ec != ecs[firstIndexEC])
                 return false;
@@ -124,11 +124,11 @@ public static class GroupSeedValidator
         int count = list.Count;
         for (int i = 0; i < count; i++)
         {
-            var genseed = rand.Next();
-            _ = rand.Next(); // unknown
+            var genseed = rand.Next(); // generate/slot seed
+            _ = rand.Next(); // alpha move, don't care
 
             var ec = GetEncryptionConstant(genseed);
-            var index = ecs.IndexOf(ec);
+            var index = list.IndexOf(ec);
             if (index == -1)
                 return false;
 
